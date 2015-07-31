@@ -1,6 +1,5 @@
-{{ path "/etc/supervisor" }}[unix_http_server]
-file  = /supervisor.sock
-chmod = 0777
+{{ path "/etc/supervisor" }}[inet_http_server]
+port=127.0.0.1:9090
 
 [supervisord]
 nodaemon         = true
@@ -11,7 +10,8 @@ loglevel         = {{ default .Env.SUPERVISOR_LOG_LEVEL "INFO" }}
 supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
 
 [supervisorctl]
-serverurl = unix:///supervisor.sock
+serverurl = http://127.0.0.1:9090
+prompt    = sctl
 
 [program:plexmediaserver]
 command                 = /usr/local/bin/start_pms
