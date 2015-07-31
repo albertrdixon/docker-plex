@@ -1,4 +1,4 @@
-FROM debian:jessie
+FROM ubuntu:15.10
 MAINTAINER Albert Dixon <albert.dixon@schange.com>
 
 ENV DEBIAN_FRONTEND noninteractive
