@@ -1,0 +1,5 @@
+EMAIL='{{ .Env.EMAIL }}'
+PASS='{{ .Env.PASS }}'
+AUTOINSTALL={{ .Env.AUTOINSTALL }}
+AUTODELETE={{ .Env.AUTODELETE }}
+{{ file "/root/.plexupdate" }}

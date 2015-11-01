@@ -39,6 +39,7 @@ ENV DOWNLOADDIR         /plexupdate
 ENV FORCE               no
 ENV PUBLIC              no
 ENV AUTOINSTALL         yes
+ENV AUTODELETE          yes
 ENV RELEASE             64-bit
 ENV URL_LOGIN           https://plex.tv/users/sign_in
 ENV URL_DOWNLOAD        https://plex.tv/downloads?channel=plexpass

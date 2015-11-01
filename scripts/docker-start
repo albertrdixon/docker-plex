@@ -2,7 +2,7 @@
 set -eo pipefail
 trap "exit 0" 2 15
 
-if [ -z "$PLEX_USERNAME" ] || [ -z "$PLEX_PASSWORD" ]; then
+if [ -z "$EMAIL" ] || [ -z "$PASS" ]; then
   echo "==> No Plex Pass credentials, using public update channel"
   export PUBLIC=yes
 fi
