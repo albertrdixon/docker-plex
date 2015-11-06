@@ -1,31 +1,38 @@
-FROM debian:jessie
+FROM alpine:3.2
 MAINTAINER Albert Dixon <albert.dixon@schange.com>
 
-ENV DEBIAN_FRONTEND noninteractive
+RUN echo "http://dl-4.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories \
+    && echo "http://dl-4.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories \
+    && apk update
+RUN apk add \
+      avahi \
+      avahi-tools \
+      bash \
+      ca-certificates \
+      dpkg \
+      ffmpeg \
+      git \
+      libcec \
+      supervisor \
+      unzip
 
-RUN apt-get update
-RUN apt-get install --no-install-recommends -y --force-yes \
-    curl wget ca-certificates avahi-daemon \
-    avahi-utils supervisor git unzip
+ADD https://github.com/albertrdixon/tmplnator/releases/download/v2.2.1/t2-linux.tgz /t2.tgz
+RUN tar xvzf /t2.tgz -C /usr/local/bin && rm -f /t2.tgz
 
-RUN curl -#kL https://github.com/albertrdixon/tmplnator/releases/download/v2.2.1/t2-linux.tgz |\
-    tar xvz -C /usr/local/bin
-
-RUN curl -#kL https://github.com/albertrdixon/escarole/releases/download/v0.1.0/escarole-linux.tar.gz |\
-    tar xvz -C /usr/local/bin
+ADD https://github.com/albertrdixon/escarole/releases/download/v0.1.1/escarole-linux.tgz /es.tgz
+RUN tar xvzf /es.tgz -C /usr/local \
+    && ln -s /usr/local/bin/escarole-linux /usr/local/bin/escarole \
+    && rm -f /es.tgz
 
 RUN git clone https://github.com/mrworf/plexupdate.git /plexupdate
 
-RUN apt-get autoremove -y && apt-get autoclean -y &&\
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-ADD bashrc /root/.bashrc
+ADD bashrc /root/.profile
 ADD configs /templates
 ADD scripts/* /usr/local/bin/
 ADD preroll /
 RUN chown root:root /usr/local/bin/* \
     && chmod a+rx /usr/local/bin/* \
-    && useradd --system --uid 797 -M --shell /usr/sbin/nologin plex \
+    && adduser -S -u 797 -s /usr/sbin/nologin plex \
     && mkdir -p /plexmediaserver \
     && chown -R plex /plexmediaserver
 
@@ -38,7 +45,6 @@ VOLUME ["/plexmediaserver"]
 EXPOSE 32400 1900 5353 32410 32412 32413 32414 32469
 
 ENV OPEN_FILE_LIMIT     32768
-ENV UPDATE_TIME         3:00
 ENV UPDATE_INTERVAL     24h
 
 ENV PLEX_MEDIA_SERVER_HOME                    /usr/lib/plexmediaserver
