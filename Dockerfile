@@ -23,8 +23,7 @@ ADD scripts/* /usr/local/bin/
 ADD preroll /
 RUN chown root:root /usr/local/bin/* &&\
     chmod a+rx /usr/local/bin/* &&\
-    mkdir -p /plexupdate /plexmediaserver &&\
-    touch /first_run
+    mkdir -p /plexupdate /plexmediaserver
 
 # Unsupported App Store
 ADD http://bit.ly/ihqmEu /uas.zip
