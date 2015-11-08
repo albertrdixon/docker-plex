@@ -1,5 +1,8 @@
 EMAIL='{{ .Env.EMAIL }}'
 PASS='{{ .Env.PASS }}'
-AUTOINSTALL={{ .Env.AUTOINSTALL }}
-AUTODELETE={{ .Env.AUTODELETE }}
+DOWNLOADDIR={{ default .Env.DOWNLOADDIR "/plexupdate" }}
+AUTOINSTALL={{ default .Env.AUTOINSTALL "yes" }}
+AUTODELETE={{ default .Env.AUTODELETE "yes" }}
+AUTOUPDATE=yes
+AUTOSTART=no
 {{ file "/root/.plexupdate" }}

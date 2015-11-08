@@ -16,7 +16,7 @@ prompt    = sctl
 [program:plexmediaserver]
 command                 = /usr/local/bin/start_pms
 directory               = /usr/lib/plexmediaserver
-user                    = root
+user                    = plex
 pidfile                 = /pms.pid
 autostart               = true
 autorestart             = true
@@ -27,7 +27,7 @@ stderr_logfile          = /dev/stderr
 stderr_logfile_maxbytes = 0
 
 [program:updater]
-command                 = escarole -C /escarole.yaml -i 24h
+command                 = escarole -C /escarole.yaml -i {{ .Env.UPDATE_INTERVAL }}
 autostart               = true
 autorestart             = true
 stdout_logfile          = /dev/stderr

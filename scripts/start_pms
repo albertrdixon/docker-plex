@@ -15,5 +15,4 @@ export LD_LIBRARY_PATH="${PLEX_MEDIA_SERVER_HOME}"
 export TMPDIR="${PLEX_MEDIA_SERVER_TMPDIR}"
 
 ulimit -s $PLEX_MAX_STACK_SIZE
-
 (cd /usr/lib/plexmediaserver; ./Plex\ Media\ Server)

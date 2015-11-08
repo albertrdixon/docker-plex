@@ -7,10 +7,13 @@ if [ -z "$EMAIL" ] || [ -z "$PASS" ]; then
   export PUBLIC=yes
 fi
 
-/usr/local/bin/plexupdate.sh
+/plexupdate/plexupdate.sh
 [ -d "/plexmediaserver/Plex Media Server/Plug-ins" ] || mkdir -p "/plexmediaserver/Plex Media Server/Plug-ins"
 if [ ! -e "/plexmediaserver/Plex Media Server/Plug-ins/UnSupportedAppstore.bundle" ]; then
   unzip /uas.zip -d "/plexmediaserver/Plex Media Server/Plug-ins"
 fi
+
+[ -f "/plexmediaserver/Plex Media Server/plexmediaserver.pid" ] && rm -vf "/plexmediaserver/Plex Media Server/plexmediaserver.pid"
+chown -R plex /plexmediaserver
 exec -a "supervisord" "/usr/bin/supervisord" "-c" "/etc/supervisor/supervisord.conf"
 exit 0
