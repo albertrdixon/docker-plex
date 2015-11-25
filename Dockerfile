@@ -22,7 +22,7 @@ RUN apt-get autoremove -y && apt-get autoclean -y &&\
 ADD bashrc /root/.bashrc
 ADD configs /templates
 ADD scripts/* /usr/local/bin/
-ADD preroll /
+ADD preroll /preroll
 RUN chown root:root /usr/local/bin/* \
     && chmod a+rx /usr/local/bin/* \
     && useradd --system --uid 797 -M --shell /usr/sbin/nologin plex \
