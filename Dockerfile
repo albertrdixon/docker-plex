@@ -1,49 +1,51 @@
 FROM debian:jessie
 MAINTAINER Albert Dixon <albert.dixon@schange.com>
 
-ENV DEBIAN_FRONTEND noninteractive
-
-RUN apt-get update
-RUN apt-get install --no-install-recommends -y --force-yes \
-    curl wget ca-certificates avahi-daemon \
-    avahi-utils supervisor git unzip
-
-RUN curl -#kL https://github.com/albertrdixon/tmplnator/releases/download/v2.2.1/t2-linux.tgz |\
-    tar xvz -C /usr/local/bin
-
-RUN curl -#kL https://github.com/albertrdixon/escarole/releases/download/v0.1.0/escarole-linux.tar.gz |\
-    tar xvz -C /usr/local/bin
-
-RUN git clone https://github.com/mrworf/plexupdate.git /plexupdate
-
-RUN apt-get autoremove -y && apt-get autoclean -y &&\
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-ADD bashrc /root/.bashrc
-ADD configs /templates
-ADD scripts/* /usr/local/bin/
-ADD preroll /preroll
-RUN chown root:root /usr/local/bin/* \
-    && chmod a+rx /usr/local/bin/* \
-    && useradd --system --uid 797 -M --shell /usr/sbin/nologin plex \
-    && mkdir -p /plexmediaserver \
-    && chown -R plex /plexmediaserver
-
-# Unsupported App Store
-ADD http://bit.ly/ihqmEu /uas.zip
-
-ENTRYPOINT ["docker-entry"]
-CMD ["docker-start"]
+ENTRYPOINT ["tini", "-g", "--", "entry"]
+CMD ["start"]
 VOLUME ["/plexmediaserver"]
 EXPOSE 32400 1900 5353 32410 32412 32413 32414 32469
 
-ENV OPEN_FILE_LIMIT     32768
-ENV UPDATE_TIME         3:00
-ENV UPDATE_INTERVAL     24h
+ENV DEBIAN_FRONTEND noninteractive
+ENV LANG en_US.UTF-8
+ENV LC_ALL C.UTF-8
+ENV LANGUAGE en_US.UTF-8
+
+ADD https://github.com/krallin/tini/releases/download/v0.8.4/tini /bin/
+ADD https://github.com/tianon/gosu/releases/download/1.7/gosu-amd64 /bin/gosu
+ADD http://bit.ly/ihqmEu /uas.zip
+ADD http://shell.ninthgate.se/packages/shell-ninthgate-se-keyring.key /ninthgate.key
+ADD entry /usr/local/sbin/
+ADD start /usr/local/sbin/
+RUN apt-key add /ninthgate.key && rm -f /ninthgate.key \
+    && echo "deb http://shell.ninthgate.se/packages/debian plexpass main" > /etc/apt/sources.list.d/plexmediaserver.list \
+    && apt-get update \
+    && apt-get install -y --force-yes --no-install-recommends \
+        avahi-daemon \
+        avahi-utils \
+        ca-certificates \
+        plexmediaserver \
+        unzip \
+    && bash -c 'chmod +x /bin/{tini,gosu} /usr/local/sbin/{entry,start}' \
+    && mkdir -p "/plexmediaserver/Plex Media Server/Plug-ins" \
+    && unzip /uas.zip -d "/plexmediaserver/Plex Media Server/Plug-ins" && rm -f /uas.zip \
+    && chown -R plex /plexmediaserver \
+    && apt-get autoremove -y && apt-get autoclean -y \
+    && rm -rvf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+ADD preroll /
+RUN {\
+        echo '#!/bin/sh'; \
+        echo 'exit 0'; \
+    } | tee /bin/{start,systemctl}
 
 ENV PLEX_MEDIA_SERVER_HOME                    /usr/lib/plexmediaserver
-ENV PLEX_MEDIA_SERVER_USER                    root
+ENV LD_LIBRARY_PATH                           /usr/lib/plexmediaserver
+ENV PLEX_MEDIA_SERVER_USER                    plex
 ENV PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR /plexmediaserver
 ENV PLEX_MEDIA_SERVER_TMPDIR                  /tmp
+ENV TMPDIR                                    /tmp
 ENV PLEX_MEDIA_SERVER_MAX_STACK_SIZE          4000
 ENV PLEX_MEDIA_SERVER_MAX_PLUGIN_PROCS        6
+
+WORKDIR /usr/lib/plexmediaserver
