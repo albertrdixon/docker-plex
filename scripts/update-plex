@@ -1,4 +1,0 @@
-#!/bin/bash
-set -e -o pipefail
-(cd /plexupdate ; ./plexupdate.sh )
-systemctl restart plexmediaserver

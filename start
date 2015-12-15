@@ -1,0 +1,3 @@
+#!/bin/bash
+chown -R plex /plexmediaserver
+exec -a plex "gosu" "plex" "$PLEX_MEDIA_SERVER_HOME/Plex Media Server"
