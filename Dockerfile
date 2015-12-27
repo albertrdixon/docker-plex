@@ -29,11 +29,6 @@ COPY dummy /bin/start
 COPY dummy /bin/systemctl
 COPY preroll /preroll
 
-# ADD https://github.com/krallin/tini/releases/download/${TINI_VER}/tini /bin/
-# ADD https://github.com/tianon/gosu/releases/download/${GOSU_VER}/gosu-amd64 /bin/gosu
-# ADD http://bit.ly/ihqmEu /uas.zip
-# ADD http://shell.ninthgate.se/packages/shell-ninthgate-se-keyring.key /ninthgate.key
-
 RUN apt-get update \
     && apt-get install -y --force-yes --no-install-recommends wget \
     && wget -q --show-progress -O - http://shell.ninthgate.se/packages/shell-ninthgate-se-keyring.key | apt-key add - \
@@ -50,8 +45,12 @@ RUN apt-get update \
     && wget -q --show-progress -O /bin/tini https://github.com/krallin/tini/releases/download/${TINI_VER}/tini \
     && wget -q --show-progress -O /bin/gosu https://github.com/tianon/gosu/releases/download/${GOSU_VER}/gosu-amd64 \
     && wget -q --show-progress -O /uas.zip http://bit.ly/ihqmEu \
+    && wget -q --show-progress -O /sublim.zip https://github.com/bramwalet/Subliminal.bundle/archive/master.zip \
     && bash -c 'chmod +x /bin/{tini,gosu} /usr/local/sbin/{entry,docker-start}' \
     && mkdir -p "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins" \
+    && unzip /sublim.zip -d "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins" \
+    && mv -v "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins/Subliminal.bundle-master" \
+        "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins/Subliminal.bundle" \
     && unzip /uas.zip -d "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins" \
     && chown -R plex "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}" \
     && apt-get autoremove -y && apt-get autoclean -y \
