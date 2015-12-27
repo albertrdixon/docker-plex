@@ -1,5 +1,7 @@
 #!/bin/bash
-[ -d "$PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR/Plex Media Server/Plug-ins/UnSupportedAppstore.bundle" ] || \
+[ -d "$PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR/Plex Media Server/Plug-ins/UnSupportedAppstore.bundle" ] || {
+  mkdir -p "$PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR/Plex Media Server/Plug-ins"
   unzip /uas.zip -d "$PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR/Plex Media Server/Plug-ins"
+}
 chown -R plex "$PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR"
 exec -a plex "gosu" "plex" "$PLEX_MEDIA_SERVER_HOME/Plex Media Server"

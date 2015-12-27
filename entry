@@ -1,3 +1,4 @@
 #!/bin/bash
 ulimit -s $PLEX_MEDIA_SERVER_MAX_STACK_SIZE
+ulimit -n $FD_LIMIT
 exec $@
