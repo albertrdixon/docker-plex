@@ -15,5 +15,8 @@ Attach your media directory somewhere in the container - I usually do /data.
 Also attach a local volume - or [data volume](https://docs.docker.com/engine/userguide/dockervolumes/#data-volumes) - at /plexmediaserver to save your configs and cache.
 
 ```
-$ docker run -d -p 32400:32400 -v /path/to/media:/data -v /opt/plex:/plexmediaserver albertdixon/plexmediaserver
+$ docker run -d -p 32400:32400 \
+   -v /path/to/media:/data \
+   -v /opt/plex:/plexmediaserver \
+   albertdixon/plexmediaserver
 ```
