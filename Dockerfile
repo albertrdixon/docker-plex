@@ -18,7 +18,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PLEX_MEDIA_SERVER_MAX_STACK_SIZE=4000 \
     PLEX_MEDIA_SERVER_TMPDIR=/tmp \
     PLEX_MEDIA_SERVER_USER=plex \
-    PLEX_VER=0.9.15.0.1621-344f193-debian \
+    PLEX_VER=0.9.15.1.1639-26325ea-debian \
     TINI_VER=v0.8.4
 
 ENV LD_LIBRARY_PATH="${PLEX_MEDIA_SERVER_HOME}:${LD_LIBRARY_PATH}" \
@@ -41,7 +41,7 @@ RUN apt-get update \
         openssl \
         plexmediaserver=${PLEX_VER} \
         unzip \
-    && echo -e "# Plex Libs\n${PLEX_MEDIA_SERVER_HOME}" >/etc/ld.so.conf.d/plexmediaserver.conf \
+    && echo "${PLEX_MEDIA_SERVER_HOME}" >/etc/ld.so.conf.d/plexmediaserver.conf \
     && ldconfig -v \
     && wget -q --show-progress --progress=bar:force:noscroll -O /bin/tini https://github.com/krallin/tini/releases/download/${TINI_VER}/tini \
     && wget -q --show-progress --progress=bar:force:noscroll -O /bin/gosu https://github.com/tianon/gosu/releases/download/${GOSU_VER}/gosu-amd64 \
