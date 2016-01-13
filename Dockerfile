@@ -18,7 +18,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PLEX_MEDIA_SERVER_MAX_STACK_SIZE=4000 \
     PLEX_MEDIA_SERVER_TMPDIR=/tmp \
     PLEX_MEDIA_SERVER_USER=plex \
-    PLEX_VER=0.9.15.0.1621-344f193-debian \
+    PLEX_VER=0.9.15.1.1639-26325ea-debian \
     TINI_VER=v0.8.4
 
 ENV LD_LIBRARY_PATH="${PLEX_MEDIA_SERVER_HOME}:${LD_LIBRARY_PATH}" \
@@ -30,22 +30,23 @@ COPY dummy /bin/systemctl
 COPY preroll /preroll
 
 RUN apt-get update \
-    && apt-get install -y --force-yes --no-install-recommends wget \
-    && wget -q --show-progress -O - http://shell.ninthgate.se/packages/shell-ninthgate-se-keyring.key | apt-key add - \
+    && apt-get install -y --force-yes --no-install-recommends wget libssl-dev \
+    && wget -q --show-progress --progress=bar:force:noscroll -O - http://shell.ninthgate.se/packages/shell-ninthgate-se-keyring.key | apt-key add - \
     && echo "deb http://shell.ninthgate.se/packages/debian plexpass main" > /etc/apt/sources.list.d/plexmediaserver.list \
     && apt-get update \
     && apt-get install -y --force-yes --no-install-recommends \
         avahi-daemon \
         avahi-utils \
         ca-certificates \
+        openssl \
         plexmediaserver=${PLEX_VER} \
         unzip \
-    && echo -e "# Plex Libs\n${PLEX_MEDIA_SERVER_HOME}" >/etc/ld.so.conf.d/plexmediaserver.conf \
+    && echo "${PLEX_MEDIA_SERVER_HOME}" >/etc/ld.so.conf.d/plexmediaserver.conf \
     && ldconfig -v \
-    && wget -q --show-progress -O /bin/tini https://github.com/krallin/tini/releases/download/${TINI_VER}/tini \
-    && wget -q --show-progress -O /bin/gosu https://github.com/tianon/gosu/releases/download/${GOSU_VER}/gosu-amd64 \
-    && wget -q --show-progress -O /uas.zip http://bit.ly/ihqmEu \
-    && wget -q --show-progress -O /sublim.zip https://github.com/bramwalet/Subliminal.bundle/archive/master.zip \
+    && wget -q --show-progress --progress=bar:force:noscroll -O /bin/tini https://github.com/krallin/tini/releases/download/${TINI_VER}/tini \
+    && wget -q --show-progress --progress=bar:force:noscroll -O /bin/gosu https://github.com/tianon/gosu/releases/download/${GOSU_VER}/gosu-amd64 \
+    && wget -q --show-progress --progress=bar:force:noscroll -O /uas.zip http://bit.ly/ihqmEu \
+    && wget -q --show-progress --progress=bar:force:noscroll -O /sublim.zip https://github.com/bramwalet/Subliminal.bundle/archive/master.zip \
     && bash -c 'chmod +x /bin/{tini,gosu} /usr/local/sbin/{entry,docker-start}' \
     && mkdir -p "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins" \
     && unzip /sublim.zip -d "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins" \
