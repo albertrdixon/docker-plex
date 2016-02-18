@@ -3,14 +3,14 @@
   oldid=$(id -u plex 2>/dev/null)
   echo "--> Updating plex uid from $oldid to $PLEX_UID (be patient...)"
   usermod -u ${PLEX_UID} plex
-  find / -user ${oldid} -exec chown -h ${PLEX_UID} {} \;
+  find / -user ${oldid} -exec chown -v -h ${PLEX_UID} {} \;
 }
 
 [ $(grep plex /etc/group|cut -d: -f3) -ne ${PLEX_GID} ] && {
   oldid=$(grep plex /etc/group|cut -d: -f3)
   echo "--> Updating plex gid from $oldid to $PLEX_GID (be patient...)"
   groupmod -g ${PLEX_GID} plex
-  find / -group ${oldid} -exec chgrp -h ${PLEX_GID} {} \;
+  find / -group ${oldid} -exec chgrp -v -h ${PLEX_GID} {} \;
   usermod -g ${PLEX_GID} plex
 }
 
