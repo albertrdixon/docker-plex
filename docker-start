@@ -1,25 +1,30 @@
 #!/bin/bash
 [ $(id -u plex 2>/dev/null) -ne ${PLEX_UID} ] && {
   oldid=$(id -u plex 2>/dev/null)
+  echo "--> Updating plex uid from $oldid to $PLEX_UID (be patient...)"
   usermod -u ${PLEX_UID} plex
-  find / -user ${oldid} -exec chown -h ${PLEX_UID} {} \;
+  find / -user ${oldid} -exec chown -v -h ${PLEX_UID} {} \;
 }
 
 [ $(grep plex /etc/group|cut -d: -f3) -ne ${PLEX_GID} ] && {
   oldid=$(grep plex /etc/group|cut -d: -f3)
+  echo "--> Updating plex gid from $oldid to $PLEX_GID (be patient...)"
   groupmod -g ${PLEX_GID} plex
-  find / -group ${oldid} -exec chgrp -h ${PLEX_GID} {} \;
+  find / -group ${oldid} -exec chgrp -v -h ${PLEX_GID} {} \;
   usermod -g ${PLEX_GID} plex
 }
 
 [ -d "$PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR/Plex Media Server/Plug-ins/UnSupportedAppstore.bundle" ] || {
+  echo "--> Unpacking unsupported app store ..."
   mkdir -p "$PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR/Plex Media Server/Plug-ins"
   unzip /uas.zip -d "$PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR/Plex Media Server/Plug-ins"
 }
 [ -d "$PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR/Plex Media Server/Plug-ins/Subliminal.bundle" ] || {
+  echo "--> Unpacking subliminal ..."
   unzip /sublim.zip -d "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins"
   mv -v "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins/Subliminal.bundle-master" \
         "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins/Subliminal.bundle"
 }
+
 chown -R plex:plex "$PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR"
 exec -a plex "gosu" "plex" "$PLEX_MEDIA_SERVER_HOME/Plex Media Server"
