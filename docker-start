@@ -14,16 +14,25 @@
   usermod -g ${PLEX_GID} plex
 }
 
-[ -d "$PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR/Plex Media Server/Plug-ins/UnSupportedAppstore.bundle" ] || {
-  echo "--> Unpacking unsupported app store ..."
-  mkdir -p "$PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR/Plex Media Server/Plug-ins"
-  unzip /uas.zip -d "$PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR/Plex Media Server/Plug-ins"
+mkdir -p "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins"
+[ -d "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins/Trakttv.bundle" ] || {
+  echo "--> Unpacking trakt ..."
+  unzip /trakt.zip -d /
+  mv -v "/Plex-Trakt-Scrobbler-master/Trakttv.bundle" \
+    "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins/"
+  rm -rf /Plex-Trakt-Scrobbler-master
 }
 [ -d "$PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR/Plex Media Server/Plug-ins/Subliminal.bundle" ] || {
   echo "--> Unpacking subliminal ..."
   unzip /sublim.zip -d "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins"
   mv -v "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins/Subliminal.bundle-master" \
         "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins/Subliminal.bundle"
+}
+[ -d "$PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR/Plex Media Server/Plug-ins/WebTools.bundle" ] || {
+  echo "--> Unpacking webtools ..."
+  unzip /webtools.zip -d "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins"
+  mv -v "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins/WebTools.bundle-master" \
+        "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins/WebTools.bundle"
 }
 
 chown -R plex:plex "$PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR"

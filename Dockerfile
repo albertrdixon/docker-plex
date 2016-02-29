@@ -1,5 +1,5 @@
 FROM debian
-MAINTAINER Albert Dixon <albert.dixon@schange.com>
+MAINTAINER Albert Dixon <albert@dixon.rocks>
 
 ENTRYPOINT ["tini", "-g", "--", "/usr/local/sbin/entry"]
 CMD ["docker-start"]
@@ -47,17 +47,23 @@ RUN apt-get update \
     && ldconfig -v \
     && wget -q --show-progress --progress=bar:force:noscroll -O /bin/tini https://github.com/krallin/tini/releases/download/${TINI_VER}/tini \
     && wget -q --show-progress --progress=bar:force:noscroll -O /bin/gosu https://github.com/tianon/gosu/releases/download/${GOSU_VER}/gosu-amd64 \
-    && wget -q --show-progress --progress=bar:force:noscroll -O /uas.zip http://bit.ly/ihqmEu \
     && wget -q --show-progress --progress=bar:force:noscroll -O /sublim.zip https://github.com/bramwalet/Subliminal.bundle/archive/master.zip \
+    && wget -q --show-progress --progress=bar:force:noscroll -O /trakt.zip https://github.com/trakt/Plex-Trakt-Scrobbler/archive/master.zip \
+    && wget -q --show-progress --progress=bar:force:noscroll -O /webtools.zip https://github.com/dagalufh/WebTools.bundle/archive/master.zip \
     && bash -c 'chmod +x /bin/{tini,gosu} /usr/local/sbin/{entry,docker-start}' \
     && mkdir -p "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins" \
     && unzip /sublim.zip -d "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins" \
     && mv -v "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins/Subliminal.bundle-master" \
         "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins/Subliminal.bundle" \
-    && unzip /uas.zip -d "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins" \
+    && unzip /trakt.zip \
+    && mv -v "/Plex-Trakt-Scrobbler-master/Trakttv.bundle" \
+        "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins/" \
+    && unzip /webtools.zip -d "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins" \
+    && mv -v "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins/WebTools.bundle-master" \
+        "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins/WebTools.bundle" \
     && chown -R plex "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}" \
     && apt-get autoremove -y && apt-get autoclean -y \
-    && rm -rvf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+    && rm -rvf /var/lib/apt/lists/* /tmp/* /var/tmp/* /Plex-Trakt-Scrobbler-master
 
 RUN useradd -M plex || true
 WORKDIR /usr/lib/plexmediaserver
