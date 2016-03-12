@@ -4,7 +4,7 @@ MAINTAINER Albert Dixon <albert@dixon.rocks>
 ENTRYPOINT ["tini", "-g", "--", "/usr/local/sbin/entry"]
 CMD ["docker-start"]
 VOLUME ["/plexmediaserver"]
-EXPOSE 32400 1900 5353 32410 32412 32413 32414 32469
+EXPOSE 32400 33400 1900 5353 32410 32412 32413 32414 32469
 
 ENV DEBIAN_FRONTEND=noninteractive \
     FD_LIMIT=32768 \
