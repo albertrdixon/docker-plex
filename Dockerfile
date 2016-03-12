@@ -23,14 +23,6 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PLEX_VER=0.9.16.0.1754-23623fb-debian \
     TINI_VER=v0.8.4
 
-ENV LD_LIBRARY_PATH="${PLEX_MEDIA_SERVER_HOME}:${LD_LIBRARY_PATH}" \
-    TMPDIR=${PLEX_MEDIA_SERVER_TMPDIR}
-
-COPY ["entry", "docker-start", "/usr/local/sbin/"]
-COPY dummy /bin/start
-COPY dummy /bin/systemctl
-COPY preroll /preroll
-
 RUN apt-get update \
     && apt-get install -y --force-yes --no-install-recommends wget libssl-dev \
     && wget -q --show-progress --progress=bar:force:noscroll -O - http://shell.ninthgate.se/packages/shell-ninthgate-se-keyring.key | apt-key add - \
@@ -50,7 +42,7 @@ RUN apt-get update \
     && wget -q --show-progress --progress=bar:force:noscroll -O /sublim.zip https://github.com/bramwalet/Subliminal.bundle/archive/master.zip \
     && wget -q --show-progress --progress=bar:force:noscroll -O /trakt.zip https://github.com/trakt/Plex-Trakt-Scrobbler/archive/master.zip \
     && wget -q --show-progress --progress=bar:force:noscroll -O /webtools.zip https://github.com/dagalufh/WebTools.bundle/archive/master.zip \
-    && bash -c 'chmod +x /bin/{tini,gosu} /usr/local/sbin/{entry,docker-start}' \
+    && chmod +x /bin/tini /bin/gosu \
     && mkdir -p "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins" \
     && unzip /sublim.zip -d "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins" \
     && mv -v "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins/Subliminal.bundle-master" \
@@ -66,4 +58,11 @@ RUN apt-get update \
     && rm -rvf /var/lib/apt/lists/* /tmp/* /var/tmp/* /Plex-Trakt-Scrobbler-master
 
 RUN useradd -M plex || true
+
+COPY ["entry", "docker-start", "/usr/local/sbin/"]
+COPY dummy /bin/start
+COPY dummy /bin/systemctl
+COPY dummy /bin/service
+COPY preroll /preroll
+
 WORKDIR /usr/lib/plexmediaserver
