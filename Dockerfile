@@ -26,24 +26,27 @@ ENV LD_LIBRARY_PATH="${PLEX_MEDIA_SERVER_HOME}:${LD_LIBRARY_PATH}" \
 
 RUN apt-get update \
     && apt-get install -y --force-yes --no-install-recommends \
-        avahi-daemon \
-        avahi-utils \
+        build-essential \
         ca-certificates \
         curl \
         git \
         openssl \
+        python \
+        python-dev \
+        ruby \
+        ruby-dev \
         unzip \
-        supervisord \
         wget \
     && curl -s https://bootstrap.pypa.io/get-pip.py | python \
     && pip install -U supervisor \
+    && gem install clockwork \
     && git clone --depth=1 https://github.com/mrworf/plexupdate.git /plexupdate \
-    && curl -# --retry 3 -o /init.deb https://github.com/Yelp/dumb-init/releases/download/v1.0.0/dumb-init_1.0.0_amd64.deb \
-    && curl -# --retry 3 https://github.com/albertrdixon/tmplnator/releases/download/v2.2.1/t2-linux.tgz |\
+    && curl -kL# --retry 3 -o /init.deb https://github.com/Yelp/dumb-init/releases/download/v1.0.0/dumb-init_1.0.0_amd64.deb \
+    && curl -kL# --retry 3 https://github.com/albertrdixon/tmplnator/releases/download/v2.2.1/t2-linux.tgz |\
             tar xz -C /bin \
-    && curl -# --retry 3 -o /sublim.zip https://github.com/bramwalet/Subliminal.bundle/archive/master.zip \
-    && curl -# --retry 3 -o /trakt.zip https://github.com/trakt/Plex-Trakt-Scrobbler/archive/master.zip \
-    && curl -# --retry 3 -o /webtools.zip https://github.com/dagalufh/WebTools.bundle/archive/master.zip \
+    && curl -kL# --retry 3 -o /sublim.zip https://github.com/bramwalet/Subliminal.bundle/archive/master.zip \
+    && curl -kL# --retry 3 -o /trakt.zip https://github.com/trakt/Plex-Trakt-Scrobbler/archive/master.zip \
+    && curl -kL# --retry 3 -o /webtools.zip https://github.com/dagalufh/WebTools.bundle/archive/master.zip \
     && dpkg -i /init.deb && rm -f /init.deb \
     && groupadd -g ${PLEX_GID} plex \
     && useradd -M -N -d "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}" -g ${PLEX_GID} -u ${PLEX_UID} plex \
@@ -66,3 +69,5 @@ COPY dummy /bin/start
 COPY dummy /bin/systemctl
 COPY dummy /bin/service
 COPY ["entry", "docker-start", "/sbin/"]
+COPY clock.rb /
+COPY supervisord.conf /etc/

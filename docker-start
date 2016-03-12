@@ -3,37 +3,52 @@
   oldid=$(id -u plex 2>/dev/null)
   echo "--> Updating plex uid from $oldid to $PLEX_UID (be patient...)"
   usermod -u ${PLEX_UID} plex
-  find / -user ${oldid} -exec chown -v -h ${PLEX_UID} {} \;
+  find / -user ${oldid} ! -path proc -exec chown -h ${PLEX_UID} {} \;
 }
 
 [ $(grep plex /etc/group|cut -d: -f3) -ne ${PLEX_GID} ] && {
   oldid=$(grep plex /etc/group|cut -d: -f3)
   echo "--> Updating plex gid from $oldid to $PLEX_GID (be patient...)"
   groupmod -g ${PLEX_GID} plex
-  find / -group ${oldid} -exec chgrp -v -h ${PLEX_GID} {} \;
+  find / -group ${oldid} ! -path proc -exec chgrp -h ${PLEX_GID} {} \;
   usermod -g ${PLEX_GID} plex
 }
 
 mkdir -p "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins"
 [ -d "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins/Trakttv.bundle" ] || {
   echo "--> Unpacking trakt ..."
-  unzip /trakt.zip -d /
-  mv -v "/Plex-Trakt-Scrobbler-master/Trakttv.bundle" \
+  unzip -q /trakt.zip -d /
+  mv "/Plex-Trakt-Scrobbler-master/Trakttv.bundle" \
     "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins/"
   rm -rf /Plex-Trakt-Scrobbler-master
 }
 [ -d "$PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR/Plex Media Server/Plug-ins/Subliminal.bundle" ] || {
   echo "--> Unpacking subliminal ..."
-  unzip /sublim.zip -d "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins"
-  mv -v "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins/Subliminal.bundle-master" \
+  unzip -q /sublim.zip -d "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins"
+  mv "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins/Subliminal.bundle-master" \
         "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins/Subliminal.bundle"
 }
 [ -d "$PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR/Plex Media Server/Plug-ins/WebTools.bundle" ] || {
   echo "--> Unpacking webtools ..."
-  unzip /webtools.zip -d "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins"
-  mv -v "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins/WebTools.bundle-master" \
+  unzip -q /webtools.zip -d "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins"
+  mv "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins/WebTools.bundle-master" \
         "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins/WebTools.bundle"
 }
 
+[ -d "$DOWNLOADDIR" ] || mkdir "$DOWNLOADDIR"
+cat >/root/.plexupdate <<EOF
+EMAIL=$EMAIL
+PASS=$PASS
+DOWNLOADDIR=$DOWNLOADDIR
+AUTOINSTALL=yes
+AUTODELETE=yes
+AUTOUPDATE=yes
+AUTOSTART=no
+EOF
+
+echo "--> Chown'ing $PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR to plex:plex"
 chown -R plex:plex "$PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR"
-exec -a plex "gosu" "plex" "$PLEX_MEDIA_SERVER_HOME/Plex Media Server"
+echo "--> Running plexupdate to get initial install"
+/plexupdate/plexupdate.sh -a -d -u
+echo "--> And. Here. We. Go!"
+exec /usr/local/bin/supervisord -c /etc/supervisord.conf
