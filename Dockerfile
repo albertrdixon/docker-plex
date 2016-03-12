@@ -35,8 +35,6 @@ RUN apt-get update \
         openssl \
         plexmediaserver=${PLEX_VER} \
         unzip \
-    && echo "${PLEX_MEDIA_SERVER_HOME}" >/etc/ld.so.conf.d/plexmediaserver.conf \
-    && ldconfig -v \
     && wget -q --show-progress --progress=bar:force:noscroll -O /bin/tini https://github.com/krallin/tini/releases/download/${TINI_VER}/tini \
     && wget -q --show-progress --progress=bar:force:noscroll -O /bin/gosu https://github.com/tianon/gosu/releases/download/${GOSU_VER}/gosu-amd64 \
     && wget -q --show-progress --progress=bar:force:noscroll -O /sublim.zip https://github.com/bramwalet/Subliminal.bundle/archive/master.zip \
@@ -57,12 +55,11 @@ RUN apt-get update \
     && apt-get autoremove -y && apt-get autoclean -y \
     && rm -rvf /var/lib/apt/lists/* /tmp/* /var/tmp/* /Plex-Trakt-Scrobbler-master
 
-RUN useradd -M plex || true
-
 COPY ["entry", "docker-start", "/usr/local/sbin/"]
 COPY dummy /bin/start
 COPY dummy /bin/systemctl
 COPY dummy /bin/service
 COPY preroll /preroll
 
+RUN useradd -M plex || true
 WORKDIR /usr/lib/plexmediaserver
