@@ -10,6 +10,5 @@ module Clockwork
     puts `supervisorctl restart plexmediaserver`
   end
 
-  # every(1.day, 'plex.update', at: ["02:30", "12:00"])
-  every(2.minute, 'plex.update')
+  every(1.day, 'plex.update', at: ["02:30", "12:00"])
 end

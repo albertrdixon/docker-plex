@@ -51,4 +51,4 @@ chown -R plex:plex "$PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR"
 echo "--> Running plexupdate to get initial install"
 /plexupdate/plexupdate.sh -a -d -u
 echo "--> And. Here. We. Go!"
-exec /usr/local/bin/supervisord -c /etc/supervisord.conf
+exec /usr/bin/supervisord -c /etc/supervisord.conf

@@ -21,24 +21,21 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PLEX_UID=7000 \
     PLEX_GID=7000
 
-ENV LD_LIBRARY_PATH="${PLEX_MEDIA_SERVER_HOME}:${LD_LIBRARY_PATH}" \
-    TMPDIR=${PLEX_MEDIA_SERVER_TMPDIR}
-
 RUN apt-get update \
     && apt-get install -y --force-yes --no-install-recommends \
         build-essential \
         ca-certificates \
         curl \
         git \
+        libxml2 \
         openssl \
         python \
         python-dev \
         ruby \
         ruby-dev \
+        supervisor \
         unzip \
         wget \
-    && curl -s https://bootstrap.pypa.io/get-pip.py | python \
-    && pip install -U supervisor \
     && gem install clockwork \
     && git clone --depth=1 https://github.com/mrworf/plexupdate.git /plexupdate \
     && curl -kL# --retry 3 -o /init.deb https://github.com/Yelp/dumb-init/releases/download/v1.0.0/dumb-init_1.0.0_amd64.deb \
