@@ -20,7 +20,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PLEX_MEDIA_SERVER_USER=plex \
     PLEX_UID=7000 \
     PLEX_GID=7000 \
-    PLEX_VER=0.9.16.4.1911-ee6e505-debian \
+    PLEX_VER=0.9.16.6.1993-5089475-debian \
     TINI_VER=v0.8.4
 
 RUN apt-get update \
