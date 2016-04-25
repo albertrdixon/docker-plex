@@ -8,7 +8,7 @@ EXPOSE 32400 33400 1900 5353 32410 32412 32413 32414 32469
 
 ENV DEBIAN_FRONTEND=noninteractive \
     FD_LIMIT=32768 \
-    GOSU_VER=1.7 \
+    GOSU_VER=1.8 \
     LANG=en_US.UTF-8 \
     LANGUAGE=en_US.UTF-8 \
     LC_ALL=C.UTF-8 \
@@ -20,8 +20,8 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PLEX_MEDIA_SERVER_USER=plex \
     PLEX_UID=7000 \
     PLEX_GID=7000 \
-    PLEX_VER=0.9.16.4.1911-ee6e505-debian \
-    TINI_VER=v0.8.4
+    PLEX_VER=0.9.16.6.1993-5089475-debian \
+    TINI_VER=v0.9.0
 
 RUN apt-get update \
     && apt-get install -y --force-yes --no-install-recommends wget libssl-dev \
