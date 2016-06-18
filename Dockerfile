@@ -25,7 +25,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
 
 RUN apt-get update \
     && apt-get install -y --force-yes --no-install-recommends wget libssl-dev \
-    && wget -q --show-progress --progress=bar:force:noscroll -O - http://shell.ninthgate.se/packages/shell-ninthgate-se-keyring.key | apt-key add - \
+    && wget -q --show-progress --progress=bar:force:noscroll -O - http://shell.ninthgate.se/packages/shell.ninthgate.se.gpg.key | apt-key add - \
     && echo "deb http://shell.ninthgate.se/packages/debian plexpass main" > /etc/apt/sources.list.d/plexmediaserver.list \
     && apt-get update \
     && apt-get install -y --force-yes --no-install-recommends \
