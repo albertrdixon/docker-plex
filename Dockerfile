@@ -9,9 +9,6 @@ EXPOSE 32400 33400 1900 5353 32410 32412 32413 32414 32469
 ENV DEBIAN_FRONTEND=noninteractive \
     FD_LIMIT=32768 \
     GOSU_VER=1.9 \
-    LANG=en_US.UTF-8 \
-    LANGUAGE=en_US.UTF-8 \
-    LC_ALL=C.UTF-8 \
     PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR=/plexmediaserver \
     PLEX_MEDIA_SERVER_HOME=/usr/lib/plexmediaserver \
     PLEX_MEDIA_SERVER_MAX_PLUGIN_PROCS=6 \
@@ -24,7 +21,15 @@ ENV DEBIAN_FRONTEND=noninteractive \
     TINI_VER=v0.9.0
 
 RUN apt-get update \
-    && apt-get install -y --force-yes --no-install-recommends wget libssl-dev \
+    && apt-get install -y locales \
+    && sed -i 's|# en_US.UTF-8|en_US.UTF-8|' /etc/locale.gen \
+    && locale-gen \
+    && dpkg-reconfigure locales
+ENV LANG=en_US.UTF-8 \
+    LANGUAGE=en_US.UTF-8 \
+    LC_ALL=en_US.UTF-8
+
+RUN apt-get install -y --force-yes --no-install-recommends wget libssl-dev \
     && wget -q --show-progress --progress=bar:force:noscroll -O - http://shell.ninthgate.se/packages/shell.ninthgate.se.gpg.key | apt-key add - \
     && echo "deb http://shell.ninthgate.se/packages/debian plexpass main" > /etc/apt/sources.list.d/plexmediaserver.list \
     && apt-get update \
