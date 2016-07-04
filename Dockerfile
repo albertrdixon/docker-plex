@@ -18,7 +18,10 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PLEX_UID=7000 \
     PLEX_GID=7000 \
     PLEX_VER=1.0.0.2261-a17e99e-debian \
-    TINI_VER=v0.9.0
+    TINI_VER=v0.9.0 \
+    USE_TRAKT=yes \
+    USE_UAS=yes \
+    USE_SUBLIMINAL=no
 
 RUN apt-get update \
     && apt-get install -y locales \
