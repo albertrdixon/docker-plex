@@ -51,6 +51,7 @@ RUN apt-get install -y --force-yes --no-install-recommends wget libssl-dev \
         ca-certificates \
         openssl \
         plexmediaserver=${PLEX_VER} \
+        rsync \
         unzip \
     && wget -q --show-progress --progress=bar:force:noscroll -O /bin/tini https://github.com/krallin/tini/releases/download/${TINI_VER}/tini \
     && wget -q --show-progress --progress=bar:force:noscroll -O /bin/gosu https://github.com/tianon/gosu/releases/download/${GOSU_VER}/gosu-amd64 \
