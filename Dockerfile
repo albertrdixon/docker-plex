@@ -1,8 +1,8 @@
 FROM debian
 MAINTAINER Albert Dixon <albert@dixon.rocks>
 
-ENTRYPOINT ["tini", "-g", "--", "/usr/local/sbin/entry"]
-CMD ["docker-start"]
+ENTRYPOINT ["/bin/tini", "-g", "--", "/sbin/entry"]
+CMD ["/sbin/docker-start"]
 VOLUME ["/plexmediaserver"]
 EXPOSE 32400 33400 1900 5353 32410 32412 32413 32414 32469
 
@@ -17,8 +17,15 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PLEX_MEDIA_SERVER_USER=plex \
     PLEX_UID=7000 \
     PLEX_GID=7000 \
-    PLEX_VER=1.0.0.2261-a17e99e-debian \
-    TINI_VER=v0.9.0
+    PLEX_VER=1.0.1.2396-c094d0d-debian \
+    TINI_VER=v0.9.0 \
+    USE_TRAKT=yes \
+    USE_UAS=yes \
+    USE_SUBLIMINAL=no
+
+COPY dummy /bin/start
+COPY dummy /bin/systemctl
+COPY dummy /bin/service
 
 RUN apt-get update \
     && apt-get install -y locales \
@@ -29,6 +36,11 @@ ENV LANG=en_US.UTF-8 \
     LANGUAGE=en_US.UTF-8 \
     LC_ALL=en_US.UTF-8
 
+RUN useradd --create-home --user-group \
+      --home-dir ${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR} \
+      --shell /bin/bash \
+      --uid ${PLEX_UID} plex \
+    && groupmod --gid ${PLEX_GID} plex
 RUN apt-get install -y --force-yes --no-install-recommends wget libssl-dev \
     && wget -q --show-progress --progress=bar:force:noscroll -O - http://shell.ninthgate.se/packages/shell.ninthgate.se.gpg.key | apt-key add - \
     && echo "deb http://shell.ninthgate.se/packages/debian plexpass main" > /etc/apt/sources.list.d/plexmediaserver.list \
@@ -39,6 +51,7 @@ RUN apt-get install -y --force-yes --no-install-recommends wget libssl-dev \
         ca-certificates \
         openssl \
         plexmediaserver=${PLEX_VER} \
+        rsync \
         unzip \
     && wget -q --show-progress --progress=bar:force:noscroll -O /bin/tini https://github.com/krallin/tini/releases/download/${TINI_VER}/tini \
     && wget -q --show-progress --progress=bar:force:noscroll -O /bin/gosu https://github.com/tianon/gosu/releases/download/${GOSU_VER}/gosu-amd64 \
@@ -56,15 +69,11 @@ RUN apt-get install -y --force-yes --no-install-recommends wget libssl-dev \
     && unzip /webtools.zip -d "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins" \
     && mv -v "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins/WebTools.bundle-master" \
         "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins/WebTools.bundle" \
-    && chown -R plex "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}" \
+    && chown -R plex:plex "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}" \
     && apt-get autoremove -y && apt-get autoclean -y \
     && rm -rvf /var/lib/apt/lists/* /tmp/* /var/tmp/* /Plex-Trakt-Scrobbler-master
 
-COPY ["entry", "docker-start", "/usr/local/sbin/"]
-COPY dummy /bin/start
-COPY dummy /bin/systemctl
-COPY dummy /bin/service
+COPY ["entry", "docker-start", "/sbin/"]
 COPY preroll /preroll
 
-RUN useradd -M plex || true
 WORKDIR /usr/lib/plexmediaserver

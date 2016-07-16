@@ -14,29 +14,51 @@
   usermod -g ${PLEX_GID} plex
 }
 
-mkdir -p "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins"
-[ -d "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins/Trakttv.bundle" ] || {
+plugin_dir="${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins"
+trakt="${plugin_dir}/Trakttv.bundle"
+subl="${plugin_dir}/Subliminal.bundle"
+uas="${plugin_dir}/WebTools.bundle"
+
+[ -d "${plugin_dir}" ] || mkdir -p "${plugin_dir}"
+
+if [ "x${USE_TRAKT}" = "xyes" ]; then
   echo "--> Unpacking trakt ..."
-  unzip -q /trakt.zip -d /
-  mv "/Plex-Trakt-Scrobbler-master/Trakttv.bundle" \
-      "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins/"
-  rm -rf /Plex-Trakt-Scrobbler-master
-}
-[ -d "$PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR/Plex Media Server/Plug-ins/Subliminal.bundle" ] || {
+  unzip -q -o /trakt.zip -d /tmp/
+  rsync -az "/tmp/Plex-Trakt-Scrobbler-master/Trakttv.bundle/" "${trakt}"
+else
+  [ -d "${trakt}"] && {
+    echo "--> Removing trakt plugin ..."
+    rm -rf "${trakt}"
+  }
+fi
+
+if [ "x${USE_SUBLIMINAL}" = "xyes" ]; then
   echo "--> Unpacking subliminal ..."
-  unzip -q /sublim.zip -d "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins"
-  mv "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins/Subliminal.bundle-master" \
-      "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins/Subliminal.bundle"
-}
-[ -d "$PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR/Plex Media Server/Plug-ins/WebTools.bundle" ] || {
+  unzip -q /sublim.zip -d /tmp/
+  rsync -az "/tmp/Subliminal.bundle-master" "${subl}"
+else
+  [ -d "${subl}" ] && {
+    echo "--> Removing subliminal plugin"
+    rm -rf "${subl}"
+  }
+fi
+
+if [ "x${USE_UAS}" = "xyes" ]; then
   echo "--> Unpacking webtools ..."
-  unzip -q /webtools.zip -d "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins"
-  mv "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins/WebTools.bundle-master" \
-      "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins/WebTools.bundle"
-}
+  unzip -q -o /webtools.zip -d /tmp
+  rsync -az "/tmp/WebTools.bundle-master/" "${uas}"
+else
+  [ -d "${uas}"] && {
+    echo "--> Removing web-tools plugin"
+    rm -rf "${uas}"
+  }
+fi
+rm -rf /tmp/*
 
 echo "--> Chown'ing $PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR to plex:plex"
 chown -R plex:plex "$PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR"
+[ -f "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/plexmediaserver.pid" ] \
+  && rm -f "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/plexmediaserver.pid"
 echo "--> And. Here. We. Go!"
 export LD_LIBRARY_PATH="${PLEX_MEDIA_SERVER_HOME}"
 export TMPDIR="${PLEX_MEDIA_SERVER_TMPDIR}"
