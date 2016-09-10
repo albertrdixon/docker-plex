@@ -1,4 +1,4 @@
-FROM debian
+FROM debian:8
 MAINTAINER Albert Dixon <albert@dixon.rocks>
 
 ENTRYPOINT ["/bin/tini", "-g", "--", "/sbin/entry"]
@@ -17,7 +17,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PLEX_MEDIA_SERVER_USER=plex \
     PLEX_UID=7000 \
     PLEX_GID=7000 \
-    PLEX_VER=1.1.0.2611-ba905d2-debian \
+    PLEX_VER=1.1.3.2700-6f64a8d-debian \
     TINI_VER=v0.10.0 \
     USE_TRAKT=yes \
     USE_UAS=yes \
