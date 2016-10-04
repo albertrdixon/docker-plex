@@ -8,7 +8,7 @@ EXPOSE 32400 33400 1900 5353 32410 32412 32413 32414 32469
 
 ENV DEBIAN_FRONTEND=noninteractive \
     FD_LIMIT=32768 \
-    GOSU_VER=1.9 \
+    GOSU_VER=1.10 \
     PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR=/plexmediaserver \
     PLEX_MEDIA_SERVER_HOME=/usr/lib/plexmediaserver \
     PLEX_MEDIA_SERVER_MAX_PLUGIN_PROCS=6 \
@@ -17,7 +17,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PLEX_MEDIA_SERVER_USER=plex \
     PLEX_UID=7000 \
     PLEX_GID=7000 \
-    PLEX_VER=1.1.4.2757-24ffd60-debian \
+    PLEX_VER=1.2.1.2854-3ed5ca1-debian \
     TINI_VER=v0.10.0 \
     USE_TRAKT=yes \
     USE_UAS=yes \
@@ -59,7 +59,7 @@ RUN apt-get install -y --force-yes --no-install-recommends wget libssl-dev \
     && wget -O /bin/tini "https://github.com/krallin/tini/releases/download/${TINI_VER}/tini" \
     && wget -O /bin/tini.asc "https://github.com/krallin/tini/releases/download/${TINI_VER}/tini.asc" \
     && export GNUPGHOME="$(mktemp -d)" \
-    && gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 0527A9B7 \
+    && gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7 \
     && gpg --batch --verify /bin/gosu.asc /bin/gosu \
     && gpg --batch --verify /bin/tini.asc /bin/tini \
     && chmod +x /bin/tini /bin/gosu \
