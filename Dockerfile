@@ -6,9 +6,14 @@ CMD ["/sbin/docker-start"]
 VOLUME ["/plexmediaserver"]
 EXPOSE 32400 33400 1900 5353 32410 32412 32413 32414 32469
 
-ENV DEBIAN_FRONTEND=noninteractive \
-    FD_LIMIT=32768 \
-    GOSU_VER=1.10 \
+COPY dummy /bin/start
+COPY dummy /bin/systemctl
+COPY dummy /bin/service
+
+ENV FD_LIMIT=32768 \
+    LANG=en_US.UTF-8 \
+    LANGUAGE=en_US.UTF-8 \
+    LC_ALL=en_US.UTF-8 \
     PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR=/plexmediaserver \
     PLEX_MEDIA_SERVER_HOME=/usr/lib/plexmediaserver \
     PLEX_MEDIA_SERVER_MAX_PLUGIN_PROCS=6 \
@@ -17,42 +22,39 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PLEX_MEDIA_SERVER_USER=plex \
     PLEX_UID=7000 \
     PLEX_GID=7000 \
-    PLEX_VER=1.2.7.2987-1bef33a-debian \
-    TINI_VER=v0.13.0 \
     USE_TRAKT=yes \
     USE_UAS=yes \
     USE_SUBLIMINAL=no
 
-COPY dummy /bin/start
-COPY dummy /bin/systemctl
-COPY dummy /bin/service
-
 RUN apt-get update \
-    && apt-get install -y locales \
-    && sed -i 's|# en_US.UTF-8|en_US.UTF-8|' /etc/locale.gen \
-    && locale-gen \
-    && dpkg-reconfigure locales
-ENV LANG=en_US.UTF-8 \
-    LANGUAGE=en_US.UTF-8 \
-    LC_ALL=en_US.UTF-8
-
-RUN useradd --create-home --user-group \
-      --home-dir ${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR} \
-      --shell /bin/bash \
-      --uid ${PLEX_UID} plex \
-    && groupmod --gid ${PLEX_GID} plex
-RUN apt-get install -y --force-yes --no-install-recommends wget libssl-dev \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --force-yes --no-install-recommends wget \
     && wget -q --show-progress --progress=bar:force:noscroll -O - http://shell.ninthgate.se/packages/shell.ninthgate.se.gpg.key | apt-key add - \
     && echo "deb http://shell.ninthgate.se/packages/debian plexpass main" > /etc/apt/sources.list.d/plexmediaserver.list \
     && apt-get update \
     && apt-get install -y --force-yes --no-install-recommends \
-        avahi-daemon \
-        avahi-utils \
-        ca-certificates \
-        openssl \
-        plexmediaserver=${PLEX_VER} \
-        rsync \
-        unzip \
+          avahi-daemon \
+          avahi-utils \
+          ca-certificates \
+          curl \
+          libssl-dev \
+          locales \
+          openssl \
+          rsync \
+          unzip \
+    && sed -i 's|# en_US.UTF-8|en_US.UTF-8|' /etc/locale.gen \
+    && locale-gen \
+    && DEBIAN_FRONTEND=noninteractive dpkg-reconfigure locales \
+    && useradd --create-home --user-group \
+      --home-dir ${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR} \
+      --shell /bin/bash \
+      --uid ${PLEX_UID} plex \
+    && groupmod --gid ${PLEX_GID} plex
+
+ENV GOSU_VER=1.10 \
+    PLEX_VER=1.2.7.2987-1bef33a-debian \
+    TINI_VER=v0.13.0
+
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --force-yes --no-install-recommends plexmediaserver=${PLEX_VER} \
     && dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
     && wget -O /bin/gosu "https://github.com/tianon/gosu/releases/download/${GOSU_VER}/gosu-$dpkgArch" \
     && wget -O /bin/gosu.asc "https://github.com/tianon/gosu/releases/download/${GOSU_VER}/gosu-$dpkgArch.asc" \
@@ -83,7 +85,18 @@ RUN apt-get install -y --force-yes --no-install-recommends wget libssl-dev \
           /Plex-Trakt-Scrobbler-master /bin/*.asc \
           "$GNUPGHOME"
 
-COPY ["entry", "docker-start", "/sbin/"]
+COPY ["entry", "docker-start", "docker-test", "/sbin/"]
 COPY preroll /preroll
 
 WORKDIR /usr/lib/plexmediaserver
+
+ARG BUILD_DATE=""
+ARG VCS_REF=""
+ARG VERSION="${PLEX_VER}"
+LABEL org.label-schema.build-date=$BUILD_DATE \
+      org.label-schema.name="plex" \
+      org.label-schema.description="Plex Media Server" \
+      org.label-schema.vcs-ref=$VCS_REF \
+      org.label-schema.vcs-url="https://github.com/albertrdixon/docker-plex" \
+      org.label-schema.version=$VERSION \
+      org.label-schema.schema-version="1.0"

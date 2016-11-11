@@ -1,14 +1,16 @@
 #!/bin/bash
+. /lib/lsb/init-functions
+log_daemon_msg "Starting Plex Media Server"
 [ $(id -u plex 2>/dev/null) -ne ${PLEX_UID} ] && {
   oldid=$(id -u plex 2>/dev/null)
-  echo "--> Updating plex uid from $oldid to $PLEX_UID (be patient...)"
+  log_progress_msg "update-plex-uid"
   usermod -u ${PLEX_UID} plex
   find / -user ${oldid} -exec chown -h ${PLEX_UID} {} \;
 }
 
 [ $(grep plex /etc/group|cut -d: -f3) -ne ${PLEX_GID} ] && {
   oldid=$(grep plex /etc/group|cut -d: -f3)
-  echo "--> Updating plex gid from $oldid to $PLEX_GID (be patient...)"
+  log_progress_msg "update-plex-gid"
   groupmod -g ${PLEX_GID} plex
   find / -group ${oldid} -exec chgrp -h ${PLEX_GID} {} \;
   usermod -g ${PLEX_GID} plex
@@ -22,44 +24,44 @@ uas="${plugin_dir}/WebTools.bundle"
 [ -d "${plugin_dir}" ] || mkdir -p "${plugin_dir}"
 
 if [ "x${USE_TRAKT}" = "xyes" ]; then
-  echo "--> Unpacking trakt ..."
+  log_progress_msg "unpack-trakt"
   unzip -q -o /trakt.zip -d /tmp/
   rsync -az "/tmp/Plex-Trakt-Scrobbler-master/Trakttv.bundle/" "${trakt}"
 else
   [ -d "${trakt}"] && {
-    echo "--> Removing trakt plugin ..."
+    log_progress_msg "remove-trakt"
     rm -rf "${trakt}"
   }
 fi
 
 if [ "x${USE_SUBLIMINAL}" = "xyes" ]; then
-  echo "--> Unpacking subliminal ..."
+  log_progress_msg "unpack-subliminal"
   unzip -q /sublim.zip -d /tmp/
   rsync -az "/tmp/Subliminal.bundle-master" "${subl}"
 else
   [ -d "${subl}" ] && {
-    echo "--> Removing subliminal plugin"
+    log_progress_msg "remove-subliminal"
     rm -rf "${subl}"
   }
 fi
 
 if [ "x${USE_UAS}" = "xyes" ]; then
-  echo "--> Unpacking webtools ..."
+  log_progress_msg "unpack-web-tools"
   unzip -q -o /webtools.zip -d /tmp
   rsync -az "/tmp/WebTools.bundle-master/" "${uas}"
 else
   [ -d "${uas}"] && {
-    echo "--> Removing web-tools plugin"
+    log_progress_msg "remove-web-tools"
     rm -rf "${uas}"
   }
 fi
 rm -rf /tmp/*
 
-echo "--> Chown'ing $PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR to plex:plex"
+log_progress_msg "chown-files"
 chown -R plex:plex "$PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR"
 [ -f "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/plexmediaserver.pid" ] \
   && rm -f "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/plexmediaserver.pid"
-echo "--> And. Here. We. Go!"
+log_success_msg
 export LD_LIBRARY_PATH="${PLEX_MEDIA_SERVER_HOME}"
 export TMPDIR="${PLEX_MEDIA_SERVER_TMPDIR}"
 exec -a plex "gosu" "plex" "$PLEX_MEDIA_SERVER_HOME/Plex Media Server"
