@@ -1,5 +1,7 @@
 #!/bin/bash
-echo "*** Starting Plex ${PLEX_VER} (http://plex.tv) container. Enjoy!"
+. /lib/lsb/init-functions
+log_daemon_msg "Starting PMS Container v${PLEX_VER}"
 ulimit -s $PLEX_MEDIA_SERVER_MAX_STACK_SIZE
 ulimit -n $FD_LIMIT
+log_end_msg 0
 exec $@
