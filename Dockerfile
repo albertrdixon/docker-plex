@@ -51,7 +51,7 @@ RUN apt-get update \
     && groupmod --gid ${PLEX_GID} plex
 
 ENV GOSU_VER=1.10 \
-    PLEX_VER=1.2.7.2987-1bef33a-debian \
+    PLEX_VER=1.3.0.3059-6277334-debian \
     TINI_VER=v0.13.0
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --force-yes --no-install-recommends plexmediaserver=${PLEX_VER} \
