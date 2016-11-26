@@ -1,8 +1,8 @@
 FROM debian:8
 MAINTAINER Albert Dixon <albert@dixon.rocks>
 
-ENTRYPOINT ["/bin/tini", "-g", "--", "/sbin/entry"]
-CMD ["/sbin/docker-start"]
+ENTRYPOINT ["/bin/tini", "-g", "--", "/bin/entry"]
+CMD ["/bin/docker-start"]
 VOLUME ["/plexmediaserver"]
 EXPOSE 32400 33400 1900 5353 32410 32412 32413 32414 32469
 
@@ -85,7 +85,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --force-yes --no-install-r
           /Plex-Trakt-Scrobbler-master /bin/*.asc \
           "$GNUPGHOME"
 
-COPY ["entry", "docker-start", "docker-test", "/sbin/"]
+COPY ["entry", "docker-start", "docker-test", "/bin/"]
 COPY preroll /preroll
 
 WORKDIR /usr/lib/plexmediaserver
