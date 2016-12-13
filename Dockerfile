@@ -29,8 +29,6 @@ ENV FD_LIMIT=32768 \
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --force-yes --no-install-recommends wget \
     && wget -q --show-progress --progress=bar:force:noscroll -O - http://shell.ninthgate.se/packages/shell.ninthgate.se.gpg.key | apt-key add - \
-    && echo "deb http://shell.ninthgate.se/packages/debian plexpass main" > /etc/apt/sources.list.d/plexmediaserver.list \
-    && apt-get update \
     && apt-get install -y --force-yes --no-install-recommends \
           avahi-daemon \
           avahi-utils \
@@ -54,7 +52,9 @@ ENV GOSU_VER=1.10 \
     PLEX_VER=1.3.2.3112-1751929-debian \
     TINI_VER=v0.13.0
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --force-yes --no-install-recommends plexmediaserver=${PLEX_VER} \
+RUN echo "deb http://shell.ninthgate.se/packages/debian plexpass main" > /etc/apt/sources.list.d/plexmediaserver.list \
+    && apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --force-yes --no-install-recommends plexmediaserver=${PLEX_VER} \
     && dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
     && wget -O /bin/gosu "https://github.com/tianon/gosu/releases/download/${GOSU_VER}/gosu-$dpkgArch" \
     && wget -O /bin/gosu.asc "https://github.com/tianon/gosu/releases/download/${GOSU_VER}/gosu-$dpkgArch.asc" \
