@@ -1,0 +1,11 @@
+{{ if eq "$CHANNEL" "Public" }}
+PUBLIC=yes
+{{ else }}
+PUBLIC=no
+EMAIL='${EMAIL:?}'
+PASS='${PASS:?}'
+{{ end }}
+DOWNLOADDIR='${DOWNLOADDIR:-/tmp}'
+AUTOINSTALL=yes
+AUTODELETE=${AUTODELETE:-no}
+AUTOUPDATE=${AUTOUPDATE:-yes}

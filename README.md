@@ -12,7 +12,7 @@ Also included:
 
   * [Official Trakt Scrobbler](https://github.com/trakt/Plex-Trakt-Scrobbler)
   * [WebTools](https://github.com/dagalufh/WebTools.bundle/wiki)
-  * [Subliminal](https://github.com/bramwalet/Subliminal.bundle)
+  * [Sub-Zero](https://github.com/pannal/Sub-Zero.bundle)
   * Stupid little preroll clip I use :)
 
 ## Usage

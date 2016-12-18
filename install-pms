@@ -1,0 +1,102 @@
+#!/bin/bash
+. /lib/lsb/init-functions
+[ -n "$FD_LIMIT" ] && ulimit -n $FD_LIMIT
+[ -n "$PLEX_MEDIA_SERVER_MAX_STACK_SIZE" ] \
+  && ulimit -s $PLEX_MEDIA_SERVER_MAX_STACK_SIZE
+
+update_plugin() {
+  local plugin=$1
+  local src=$2
+  local dest=$3
+  log_action_begin_msg "Update $plugin Plugin"
+  ( 
+    cd "$src"
+    git pull --quiet --ff-only
+    rsync -qaz "$src" "$dest"
+    chown -R plex "$dest"
+    chgrp -R plex "$dest"
+  ) >/dev/null & pid=$!
+  while kill -0 $pid 2>/dev/null ; do log_action_cont_msg ; sleep 0.5 ; done
+  log_action_end_msg 0
+}
+
+remove_plugin() {
+  local plugin=$1
+  local src=$1
+  [ -d "$src"] && {
+    log_action_begin_msg "Remove $plugin Plugin"
+    rm -rf "$src" >/dev/null & pid=$!
+    while kill -0 $pid 2>/dev/null ; do log_action_cont_msg ; sleep 0.1 ; done
+    log_action_end_msg 0
+  }
+}
+
+echo "---> Starting Plex Media Server ($CHANNEL)"
+log_action_begin_msg "Installing Plex $CHANNEL"
+(
+  [ -f /etc/plexupdate.conf ] || sigil -p -f /config >/etc/plexupdate.conf
+  cd /opt/plexupdate
+  git pull --ff-only --quiet
+  /opt/plexupdate/plexupdate.sh --config /etc/plexupdate.conf
+) >/dev/null & pid=$!
+while kill -0 $pid 2>/dev/null ; do log_action_cont_msg ; sleep 0.5 ; done
+log_action_end_msg 0
+
+[ $(id -u plex 2>/dev/null) -ne ${PLEX_UID} ] && {
+  oldid=$(id -u plex 2>/dev/null)
+  log_action_begin_msg "Updating Plex UID"
+  (
+    usermod -u ${PLEX_UID} plex
+    find / -user ${oldid} -exec chown -h ${PLEX_UID} {} \;
+  ) >/dev/null & pid=$!
+  while kill -0 $pid 2>/dev/null ; do log_action_cont_msg ; sleep 0.25 ; done
+  log_action_end_msg 0
+}
+
+[ $(grep plex /etc/group|cut -d: -f3) -ne ${PLEX_GID} ] && {
+  oldid=$(grep plex /etc/group|cut -d: -f3)
+  log_action_begin_msg "Update Plex GID"
+  (
+    groupmod -g ${PLEX_GID} plex
+    find / -group ${oldid} -exec chgrp -h ${PLEX_GID} {} \;
+    usermod -g ${PLEX_GID} plex
+  ) >/dev/null & pid=$!
+  while kill -0 $pid 2>/dev/null ; do log_action_cont_msg ; sleep 0.25 ; done
+  log_action_end_msg 0
+}
+
+plugin_dir="${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins"
+trakt="/plugins/Plex-Trakt-Scrobbler/Trakttv.bundle"
+subz="/plugins/Sub-Zero.bundle"
+uas="/plugins/WebTools.bundle"
+
+[ -d "${plugin_dir}" ] || mkdir -p "${plugin_dir}"
+
+if [ "x${USE_TRAKT}" = "xyes" ]; then
+  update_plugin "TraktTV" "$trakt" "$plugin_dir"
+else
+  remove_plugin "TraktTV" "${trakt}/../"
+fi
+
+if [ "x${USE_SUBZERO}" = "xyes" ]; then
+  update_plugin "SubZero" "$subz" "$plugin_dir"
+else
+  remove_plugin "SubZero" "$subz"
+fi
+
+if [ "x${USE_UAS}" = "xyes" ]; then
+  update_plugin "WebTools" "$uas" "$plugin_dir"
+else
+  remove_plugin "WebTools" "$uas"
+fi
+
+log_action_begin_msg "Set Support Dir Permissions"
+(
+  chown -R plex "$PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR"
+  chgrp -R plex "$PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR"
+) >/dev/null & pid=$!
+while kill -0 $pid 2>/dev/null ; do log_action_cont_msg ; sleep 0.5 ; done
+log_action_end_msg 0
+rm -rf /tmp/*
+echo '---> Done!' ; echo
+exit 0
