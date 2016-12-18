@@ -1,5 +1,9 @@
 # Plex Media Server - :whale: ized
 
+[![](https://images.microbadger.com/badges/version/albertdixon/plex.svg)](https://microbadger.com/images/albertdixon/plex "Get your own version badge on microbadger.com")
+[![](https://images.microbadger.com/badges/image/albertdixon/plex.svg)](https://microbadger.com/images/albertdixon/plex "Get your own image badge on microbadger.com")
+[![](https://images.microbadger.com/badges/commit/albertdixon/plex.svg)](https://microbadger.com/images/albertdixon/plex "Get your own commit badge on microbadger.com")
+
 A (sort of) minimal Debian container running [Plex Media Server](http://plex.tv)
 
 __NOTE:__ Requires [Plex Pass subscription](https://plex.tv/subscription/about)

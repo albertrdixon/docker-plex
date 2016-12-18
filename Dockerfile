@@ -49,7 +49,7 @@ RUN apt-get update \
     && groupmod --gid ${PLEX_GID} plex
 
 ENV GOSU_VER=1.10 \
-    PLEX_VER=1.3.2.3112-1751929-debian \
+    PLEX_VER=1.3.3.3148-b38628e-debian \
     TINI_VER=v0.13.0
 
 RUN echo "deb http://shell.ninthgate.se/packages/debian plexpass main" > /etc/apt/sources.list.d/plexmediaserver.list \
