@@ -18,7 +18,7 @@ log_daemon_msg "Starting Plex Media Server"
 
 plugin_dir="${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins"
 trakt="${plugin_dir}/Trakttv.bundle"
-subl="${plugin_dir}/Subliminal.bundle"
+subz="${plugin_dir}/Sub-Zero.bundle"
 uas="${plugin_dir}/WebTools.bundle"
 
 [ -d "${plugin_dir}" ] || mkdir -p "${plugin_dir}"
@@ -34,14 +34,14 @@ else
   }
 fi
 
-if [ "x${USE_SUBLIMINAL}" = "xyes" ]; then
-  log_progress_msg "unpack-subliminal"
-  unzip -q /sublim.zip -d /tmp/
-  rsync -az "/tmp/Subliminal.bundle-master" "${subl}"
+if [ "x${USE_SUBZERO}" = "xyes" ]; then
+  log_progress_msg "unpack-subzero"
+  unzip -q /subzero.zip -d /tmp/
+  rsync -az "/tmp/Sub-Zero.bundle-master" "${subz}"
 else
-  [ -d "${subl}" ] && {
-    log_progress_msg "remove-subliminal"
-    rm -rf "${subl}"
+  [ -d "${subz}" ] && {
+    log_progress_msg "remove-subzero"
+    rm -rf "${subz}"
   }
 fi
 

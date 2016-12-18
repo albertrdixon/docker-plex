@@ -24,7 +24,7 @@ ENV FD_LIMIT=32768 \
     PLEX_GID=7000 \
     USE_TRAKT=yes \
     USE_UAS=yes \
-    USE_SUBLIMINAL=no
+    USE_SUBZERO=yes
 
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --force-yes --no-install-recommends wget \
@@ -65,13 +65,13 @@ RUN echo "deb http://shell.ninthgate.se/packages/debian plexpass main" > /etc/ap
     && gpg --batch --verify /bin/gosu.asc /bin/gosu \
     && gpg --batch --verify /bin/tini.asc /bin/tini \
     && chmod +x /bin/tini /bin/gosu \
-    && wget -O /sublim.zip https://github.com/bramwalet/Subliminal.bundle/archive/master.zip \
+    && wget -O /subzero.zip https://github.com/pannal/Sub-Zero.bundle/archive/master.zip \
     && wget -O /trakt.zip https://github.com/trakt/Plex-Trakt-Scrobbler/archive/master.zip \
     && wget -O /webtools.zip https://github.com/dagalufh/WebTools.bundle/archive/master.zip \
     && mkdir -p "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins" \
-    && unzip /sublim.zip -d "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins" \
-    && mv -v "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins/Subliminal.bundle-master" \
-        "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins/Subliminal.bundle" \
+    && unzip /subzero.zip -d "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins" \
+    && mv -v "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins/Sub-Zero.bundle-master" \
+        "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins/Sub-Zero.bundle" \
     && unzip /trakt.zip \
     && mv -v "/Plex-Trakt-Scrobbler-master/Trakttv.bundle" \
         "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Plug-ins/" \
