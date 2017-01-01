@@ -37,7 +37,7 @@ fi
 if [ "x${USE_SUBZERO}" = "xyes" ]; then
   log_progress_msg "unpack-subzero"
   unzip -q /subzero.zip -d /tmp/
-  rsync -az "/tmp/Sub-Zero.bundle-master" "${subz}"
+  rsync -az "/tmp/Sub-Zero.bundle-master/" "${subz}"
 else
   [ -d "${subz}" ] && {
     log_progress_msg "remove-subzero"
