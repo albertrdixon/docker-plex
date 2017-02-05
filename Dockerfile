@@ -50,7 +50,7 @@ RUN apt-get update \
 
 ENV GOSU_VER=1.10 \
     PLEX_VER=1.3.4.3285-b46e0ea-debian \
-    TINI_VER=v0.13.0
+    TINI_VER=v0.14.0
 
 RUN echo "deb http://shell.ninthgate.se/packages/debian plexpass main" > /etc/apt/sources.list.d/plexmediaserver.list \
     && apt-get update \
