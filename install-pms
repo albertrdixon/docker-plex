@@ -23,7 +23,7 @@ update_plugin() {
 remove_plugin() {
   local plugin=$1
   local src=$1
-  [ -d "$src"] && {
+  [ -d "$src" ] && {
     log_action_begin_msg "Remove $plugin Plugin"
     rm -rf "$src" >/dev/null & pid=$!
     while kill -0 $pid 2>/dev/null ; do log_action_cont_msg ; sleep 0.1 ; done
