@@ -9,7 +9,7 @@ update_plugin() {
   local src=$2
   local dest=$3
   log_action_begin_msg "Update $plugin Plugin"
-  ( 
+  (
     cd "$src"
     git pull --quiet --ff-only
     rsync -qaz "$src" "$dest"
@@ -53,7 +53,7 @@ log_action_end_msg 0
   log_action_end_msg 0
 }
 
-[ $(grep plex /etc/group|cut -d: -f3) -ne ${PLEX_GID} ] && {
+[ $(grep plex: /etc/group|cut -d: -f3) -ne ${PLEX_GID} ] && {
   oldid=$(grep plex /etc/group|cut -d: -f3)
   log_action_begin_msg "Update Plex GID"
   (
