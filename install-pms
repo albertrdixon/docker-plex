@@ -53,8 +53,8 @@ log_action_end_msg 0
   log_action_end_msg 0
 }
 
-[ $(grep plex: /etc/group|cut -d: -f3) -ne ${PLEX_GID} ] && {
-  oldid=$(grep plex /etc/group|cut -d: -f3)
+[ $(id -g plex 2>/dev/null) -ne ${PLEX_GID} ] && {
+  oldid=$(id -g plex)
   log_action_begin_msg "Update Plex GID"
   (
     groupmod -g ${PLEX_GID} plex
