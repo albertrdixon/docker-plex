@@ -62,6 +62,15 @@ chown -R plex:plex "$PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR"
 [ -f "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/plexmediaserver.pid" ] \
   && rm -f "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/plexmediaserver.pid"
 log_success_msg
+
+(
+  echo "Waiting for logs..."
+  until [ -d "${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Logs" ]; do sleep 0.5 ; done
+  sleep 5
+  files=("${PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR}/Plex Media Server/Logs/"*/*.log)
+  exec tail -n+0 -qF "${files[@]}"
+) &
+
 export LD_LIBRARY_PATH="${PLEX_MEDIA_SERVER_HOME}"
 export TMPDIR="${PLEX_MEDIA_SERVER_TMPDIR}"
 exec -a plex "gosu" "plex" "$PLEX_MEDIA_SERVER_HOME/Plex Media Server"
